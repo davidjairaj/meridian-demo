@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; frame-src 'self' blob:; worker-src blob:; img-src data: blob:; form-action 'none'; base-uri 'none'; object-src 'none'">
+<title>Meridian — Private demonstration</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#0b1219;color:#eaf1f4;font-family:Arial,Helvetica,sans-serif}body{min-height:100vh}button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible{outline:2px solid #88e7e1;outline-offset:4px}.entry{min-height:100vh;display:grid;grid-template-columns:1.15fr 1fr}.identity{padding:52px 64px;display:flex;flex-direction:column;border-right:1px solid #2a3a45;position:relative}.brand{display:flex;align-items:center;gap:16px;font-size:21px;letter-spacing:.25em;font-weight:500}.brand svg{width:40px;height:40px;stroke:#88e7e1;fill:none;stroke-width:1.3}.identity-main{margin:auto 0;padding:65px 0}.overline{font-family:ui-monospace,monospace;font-size:12px;color:#99b5c2;letter-spacing:.12em}.identity h1{font-size:clamp(40px,4.7vw,76px);font-weight:300;line-height:1.07;letter-spacing:-.045em;margin:25px 0;color:#edf5f7}.identity h1 span{color:#88e7e1}.identity p{max-width:390px;color:#a9bfca;font-size:17px;line-height:1.7;margin:25px 0}.datum{height:1px;width:96px;background:#88e7e1;margin-top:46px}.identity-foot{display:flex;justify-content:space-between;color:#9fb4be;font-size:12px;font-family:ui-monospace,monospace;gap:20px}.unlock{display:flex;align-items:center;padding:70px;position:relative}.form{width:100%;max-width:390px;margin:auto}.form h2{font-size:32px;font-weight:400;letter-spacing:-.035em;margin:15px 0}.form>p{font-size:16px;line-height:1.6;color:#a9bfca;margin:0 0 35px}.form label{display:block;font-size:14px;margin-top:23px;color:#d7e5ec}.form input{display:block;width:100%;padding:15px 13px;margin-top:10px;border:1px solid #48606d;background:#111f2a;color:#f3f8fa;border-radius:0;min-height:50px}.form button{width:100%;padding:16px;margin-top:32px;border:1px solid #88e7e1;background:#88e7e1;color:#102832;font-size:15px;text-align:left;display:flex;justify-content:space-between}.form button:disabled{opacity:.65;cursor:wait}.status{min-height:24px;margin-top:18px;color:#f1bf82;font-size:14px}.privacy{font-size:12px!important;border-top:1px solid #2a3a45;padding-top:20px;line-height:1.7!important;margin-top:25px!important;color:#99b2c1!important}.entry[hidden]{display:none}#application{position:fixed;inset:0;border:0;width:100%;height:100%;background:#0b1219}#lock{position:fixed;bottom:12px;right:20px;z-index:9999;border:1px solid #587583;color:#c9eff0;background:#132b35;padding:9px 16px;font-size:12px}#lock[hidden]{display:none}@media(max-width:900px){.entry{grid-template-columns:1fr}.identity{padding:28px;border-right:0;border-bottom:1px solid #2a3a45}.identity-main{padding:35px 0 15px}.identity h1{font-size:42px}.identity p{display:none}.datum{display:none}.identity-foot{margin-top:20px;font-size:11px}.unlock{padding:35px 28px}.form{max-width:520px}.form h2{font-size:28px}.brand{font-size:18px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<main class="entry" id="entry">
+<section class="identity"><div class="brand"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M5 31V9l15 13L35 9v22M5 9h8l7 13 7-13h8"/></svg>MERIDIAN</div><div class="identity-main"><span class="overline">FINANCIAL INTELLIGENCE</span><h1>See the movement.<br><span>Understand<br>the decision.</span></h1><p>A private demonstration of money movement, research decisions and the evidence behind them.</p><div class="datum"></div></div><div class="identity-foot"><span>EXECUTIVE DEMONSTRATION</span><span>01 / ACCESS</span></div></section>
+<section class="unlock"><form class="form" id="unlock" autocomplete="off"><span class="overline">PRIVATE ACCESS</span><h2>Enter the demonstration.</h2><p>Use the credentials provided for your session.</p><label for="username">Username<input id="username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required></label><label for="password">Password<input id="password" name="password" type="password" autocomplete="current-password" required></label><button id="submit" type="submit"><span>Unlock Meridian</span><span aria-hidden="true">↗</span></button><div class="status" id="status" role="status" aria-live="polite"></div><p class="privacy">The demonstration unlocks in this browser. Credentials are not sent to a server. Synthetic data only. No payment or regulatory authority.</p></form></section>
+</main><button id="lock" type="button" hidden>Lock demonstration ×</button>
+<script>
+'use strict';
+const entry = document.getElementById('entry'), form = document.getElementById('unlock'), status = document.getElementById('status'), submit = document.getElementById('submit'), lockButton = document.getElementById('lock');
+let appFrame = null, generation = 0;
+const bytes = value => Uint8Array.from(atob(value), c => c.charCodeAt(0));
+function lock() { generation++; if(appFrame) appFrame.remove(); appFrame = null; entry.hidden = false; lockButton.hidden = true; form.reset(); status.textContent = ''; submit.disabled = false; document.getElementById('username').focus(); }
+lockButton.addEventListener('click', lock);
+window.addEventListener('pagehide', lock);
+window.addEventListener('message', event => { if(appFrame && event.source === appFrame.contentWindow && event.data?.type === 'lock-demo') lock(); });
+form.addEventListener('submit', async event => {
+ event.preventDefault(); const attempt = ++generation; submit.disabled = true; status.textContent = 'Unlocking the demonstration…';
+ try {
+  if(!window.crypto?.subtle) throw new Error('Unavailable');
+  const response = await fetch('./payload.json', { cache: 'no-store', credentials: 'omit' });
+  if(!response.ok) throw new Error('Unavailable');
+  const envelope = await response.json();
+  if(envelope.version !== 1 || envelope.iterations !== 600000 || Object.keys(envelope).sort().join(',') !== 'ciphertext,iterations,iv,salt,version') throw new Error('Invalid envelope');
+  const salt = bytes(envelope.salt), iv = bytes(envelope.iv), ciphertext = bytes(envelope.ciphertext);
+  if(salt.length !== 16 || iv.length !== 12 || ciphertext.length < 17 || ciphertext.length > 10000000) throw new Error('Invalid envelope');
+  const encoder = new TextEncoder();
+  const material = await crypto.subtle.importKey('raw', encoder.encode(form.username.value.trim().toLowerCase() + '\0' + form.password.value), 'PBKDF2', false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey({ name:'PBKDF2', salt, iterations:600000, hash:'SHA-256' }, material, { name:'AES-GCM', length:256 }, false, ['decrypt']);
+  const clear = await crypto.subtle.decrypt({ name:'AES-GCM', iv, additionalData:encoder.encode('meridian-demo/v1'), tagLength:128 }, key, ciphertext);
+  const html = new TextDecoder('utf-8', { fatal:true }).decode(clear);
+  if(attempt !== generation) return;
+  const frame = document.createElement('iframe'); frame.id = 'application'; frame.title = 'Meridian financial intelligence demonstration'; frame.setAttribute('sandbox', 'allow-scripts allow-downloads allow-forms'); frame.srcdoc = html;
+  appFrame = frame; document.body.appendChild(frame); entry.hidden = true; lockButton.hidden = false; form.reset(); status.textContent = '';
+ } catch { if(attempt === generation) status.textContent = 'Unable to unlock. Check your credentials and try again.'; }
+ finally { if(attempt === generation) submit.disabled = false; }
+});
+</script>
+</body></html>
